@@ -19,15 +19,15 @@ This is a passion project while I actively study and work, so it won't get frequ
    ```bash
    git clone https://github.com/momchilgeorgiev/dnd-5e-helper.git
 2. **Install Dependencies:**
-```bash
-pip install requests prettytable prompt_toolkit colorama
-```
+   ```bash
+   pip install requests prettytable prompt_toolkit colorama
+   ```
 
 ## Usage
 Open terminal and run:
 
 ```bash
-python dnd_cli.py  
+python main.py  
 ```
 
 Select a Category: Use the fuzzy search to choose a category (e.g., spells, monsters).
