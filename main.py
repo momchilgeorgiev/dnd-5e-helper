@@ -44,21 +44,36 @@ def display_item_details(item_data, key_prefix=""):
     table.field_names = [Fore.GREEN + Style.BRIGHT + "Attribute" + Style.RESET_ALL, 
                          Fore.GREEN + Style.BRIGHT + "Value" + Style.RESET_ALL]
     table.align = "l"
-    table.max_width = 60
+    table.max_width = 100  # Increased max width
 
     for key, value in item_data.items():
         full_key = f"{key_prefix}{key}"
         if isinstance(value, (str, int, float, bool)):
             table.add_row([Fore.CYAN + full_key.capitalize() + Style.RESET_ALL, 
-                           Fore.WHITE + "\n".join(wrap_text(str(value))) + Style.RESET_ALL])
-        elif isinstance(value, list) and all(isinstance(x, (str, int, float, bool)) for x in value):
+                           Fore.WHITE + "\n".join(wrap_text(str(value), width=80)) + Style.RESET_ALL])
+        elif isinstance(value, list):
+            if all(isinstance(x, (str, int, float, bool)) for x in value):
+                formatted_value = ", ".join(str(x) for x in value)
+                table.add_row([Fore.CYAN + full_key.capitalize() + Style.RESET_ALL, 
+                               Fore.WHITE + "\n".join(wrap_text(formatted_value, width=80)) + Style.RESET_ALL])
+            else:
+                formatted_value = "\n".join([format_nested_item(item) for item in value])
+                table.add_row([Fore.CYAN + full_key.capitalize() + Style.RESET_ALL, 
+                               Fore.WHITE + formatted_value + Style.RESET_ALL])
+        elif isinstance(value, dict):
+            formatted_value = format_nested_item(value)
             table.add_row([Fore.CYAN + full_key.capitalize() + Style.RESET_ALL, 
-                           Fore.WHITE + "\n".join(wrap_text(value)) + Style.RESET_ALL])
-        elif isinstance(value, dict) or (isinstance(value, list) and any(isinstance(x, dict) for x in value)):
-            table.add_row([Fore.CYAN + full_key.capitalize() + Style.RESET_ALL, 
-                           Fore.YELLOW + "(Nested data)" + Style.RESET_ALL])
+                           Fore.WHITE + formatted_value + Style.RESET_ALL])
 
     print(table)
+
+def format_nested_item(item):
+    if isinstance(item, dict):
+        return ", ".join([f"{k}: {format_nested_item(v)}" for k, v in item.items()])
+    elif isinstance(item, list):
+        return ", ".join([format_nested_item(i) for i in item])
+    else:
+        return str(item)
 
 def explore_item(item_data, path=""):
     while True:
